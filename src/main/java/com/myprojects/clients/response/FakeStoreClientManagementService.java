@@ -2,9 +2,8 @@ package com.myprojects.clients.response;
 
 import com.myprojects.application.constant.CommonConstants;
 import com.myprojects.clients.request.IClientManagementService;
-import com.myprojects.interfaces.rest.request.AddProductRequest;
-import com.myprojects.interfaces.rest.request.ProductResponse;
-import com.myprojects.interfaces.rest.response.AddProductResponse;
+import com.myprojects.infrastructure.persistence.entity.ProductProjection;
+import com.myprojects.interfaces.rest.request.CreateProductRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -23,36 +22,36 @@ public class FakeStoreClientManagementService implements IClientManagementServic
     private final WebClient.Builder webClientBuilder;
 
     @Override
-    public AddProductResponse addNewProduct(AddProductRequest addProductRequest) {
-        log.info("Started creating product in FakeStore Client with request : {}", addProductRequest);
-        Mono<AddProductResponse> addProductResponseMono = webClientBuilder.build()
+    public ProductProjection addNewProduct(CreateProductRequest createProductRequest) {
+        log.info("Started creating product in FakeStore Client with request : {}", createProductRequest);
+        Mono<ProductProjection> createProductResponseMono = webClientBuilder.build()
                 .post()
                 .uri(CommonConstants.FAKE_STORE_CLIENT_API_URL)
-                .bodyValue(addProductRequest)
+                .bodyValue(createProductRequest)
                 .retrieve()
                 .onStatus(httpStatusCode -> httpStatusCode.is4xxClientError() || httpStatusCode.is5xxServerError(),
                         clientResponse -> Mono.error(new RuntimeException("FakeStore Client create product API call failed with status code: " + clientResponse.statusCode())))
-                .bodyToMono(AddProductResponse.class);
+                .bodyToMono(ProductProjection.class);
 
-        AddProductResponse addProductResponse = null;
-        if (!ObjectUtils.isEmpty(addProductResponseMono.block())) {
-            addProductResponse = addProductResponseMono.block();
-            log.info("Successfully created product in FakeStore Client with response  : {}", addProductResponse);
+        ProductProjection createProductResponse = null;
+        if (!ObjectUtils.isEmpty(createProductResponseMono.block())) {
+            createProductResponse = createProductResponseMono.block();
+            log.info("Successfully created product in FakeStore Client with response  : {}", createProductResponse);
         }
-        return addProductResponse;
+        return createProductResponse;
     }
 
     @Override
-    public ProductResponse deleteProduct(Integer productId) {
+    public ProductProjection deleteProduct(Integer productId) {
         log.info("Started deleting product in FakeStore Client with productId : {}", productId);
-        Mono<ProductResponse> productResponseMono = webClientBuilder.build()
+        Mono<ProductProjection> productResponseMono = webClientBuilder.build()
                 .delete()
                 .uri(CommonConstants.FAKE_STORE_CLIENT_API_URL + "/" + productId)
                 .retrieve()
                 .onStatus(httpStatusCode -> httpStatusCode.is4xxClientError() || httpStatusCode.is5xxServerError(),
                         clientResponse -> Mono.error(new RuntimeException("FakeStore Client delete product API call failed with status code: " + clientResponse.statusCode())))
-                .bodyToMono(ProductResponse.class);
-        ProductResponse productResponse = null;
+                .bodyToMono(ProductProjection.class);
+        ProductProjection productResponse = null;
         if (!ObjectUtils.isEmpty(productResponseMono.block())) {
             productResponse = productResponseMono.block();
             log.info("Deleted product successfully in FakeStore Client  with productId : {}", productId);
@@ -61,19 +60,18 @@ public class FakeStoreClientManagementService implements IClientManagementServic
     }
 
     @Override
-    public List<ProductResponse> fetchAllProducts() {
+    public List<ProductProjection> fetchAllProducts() {
         log.info("Started fetching all products in FakeStore Client");
-        Mono<List<ProductResponse>> productsList = webClientBuilder.build()
+        Mono<List<ProductProjection>> productsList = webClientBuilder.build()
                 .get()
                 .uri(CommonConstants.FAKE_STORE_CLIENT_API_URL)
                 .retrieve()
                 .onStatus(httpStatusCode -> httpStatusCode.is4xxClientError() || httpStatusCode.is5xxServerError(),
                         clientResponse -> Mono.error(new RuntimeException("FakeStore Client fetch all product API call failed with status code: " + clientResponse.statusCode())))
-                .bodyToMono(new ParameterizedTypeReference<List<ProductResponse>>() {
+                .bodyToMono(new ParameterizedTypeReference<List<ProductProjection>>() {
 
                 });
-
-        List<ProductResponse> productResponseList = null;
+        List<ProductProjection> productResponseList = null;
         if (!ObjectUtils.isEmpty(productsList.block())) {
             productResponseList = productsList.block();
             log.info("Fetched all products in FakeStore Client with size: {}", productResponseList.size());
@@ -82,17 +80,17 @@ public class FakeStoreClientManagementService implements IClientManagementServic
     }
 
     @Override
-    public ProductResponse fetchProduct(Integer productId) {
+    public ProductProjection fetchProduct(Integer productId) {
         log.info("Started fetching product in FakeStore Client with productId : {}", productId);
-        Mono<ProductResponse> productResponseMono = webClientBuilder.build()
+        Mono<ProductProjection> productResponseMono = webClientBuilder.build()
                 .get()
                 .uri(CommonConstants.FAKE_STORE_CLIENT_API_URL + "/" + productId)
                 .retrieve()
                 .onStatus(httpStatusCode -> httpStatusCode.is4xxClientError() || httpStatusCode.is5xxServerError(),
                         clientResponse -> Mono.error(new RuntimeException("FakeStore Client fetch product API call failed with status code: " + clientResponse.statusCode())))
-                .bodyToMono(ProductResponse.class);
+                .bodyToMono(ProductProjection.class);
 
-        ProductResponse productResponse = null;
+        ProductProjection productResponse = null;
         if (!ObjectUtils.isEmpty(productResponseMono.block())) {
             productResponse = productResponseMono.block();
             log.info("Fetched product successfully in FakeStore Client with productId : {}", productId);
@@ -101,17 +99,17 @@ public class FakeStoreClientManagementService implements IClientManagementServic
     }
 
     @Override
-    public ProductResponse updateOrProduct(Integer productId, AddProductRequest addProductRequest) {
-        log.info("Started creating or updating product in FakeStore Client with request : {}", addProductRequest);
-        Mono<ProductResponse> productResponseMono = webClientBuilder.build()
+    public ProductProjection createOrUpdateProduct(Integer productId, CreateProductRequest createProductRequest) {
+        log.info("Started creating or updating product in FakeStore Client with request : {}", createProductRequest);
+        Mono<ProductProjection> productResponseMono = webClientBuilder.build()
                 .put()
                 .uri(CommonConstants.FAKE_STORE_CLIENT_API_URL + "/" + productId)
-                .bodyValue(addProductRequest)
+                .bodyValue(createProductRequest)
                 .retrieve()
                 .onStatus(httpStatusCode -> httpStatusCode.is4xxClientError() || httpStatusCode.is5xxServerError(),
                         clientResponse -> Mono.error(new RuntimeException("FakeStore Client create or update product API call failed with status code: " + clientResponse.statusCode())))
-                .bodyToMono(ProductResponse.class);
-        ProductResponse productResponse = null;
+                .bodyToMono(ProductProjection.class);
+        ProductProjection productResponse = null;
         if (!ObjectUtils.isEmpty(productResponseMono.block())) {
             productResponse = productResponseMono.block();
             log.info("Created or Updated product successfully in FakeStore Client with id : {}", productId);
@@ -120,17 +118,17 @@ public class FakeStoreClientManagementService implements IClientManagementServic
     }
 
     @Override
-    public ProductResponse updateProduct(Integer productId, AddProductRequest addProductRequest) {
-        log.info("Started updating product in FakeStore Client with request : {}", addProductRequest);
-        Mono<ProductResponse> productResponseMono = webClientBuilder.build()
+    public ProductProjection updateProduct(Integer productId, CreateProductRequest createProductRequest) {
+        log.info("Started updating product in FakeStore Client with request : {}", createProductRequest);
+        Mono<ProductProjection> productResponseMono = webClientBuilder.build()
                 .patch()
                 .uri(CommonConstants.FAKE_STORE_CLIENT_API_URL + "/" + productId)
-                .bodyValue(addProductRequest)
+                .bodyValue(createProductRequest)
                 .retrieve()
                 .onStatus(httpStatusCode -> httpStatusCode.is4xxClientError() || httpStatusCode.is5xxServerError(),
                         clientResponse -> Mono.error(new RuntimeException("FakeStore Client update product API call failed with status code: " + clientResponse.statusCode())))
-                .bodyToMono(ProductResponse.class);
-        ProductResponse productResponse = null;
+                .bodyToMono(ProductProjection.class);
+        ProductProjection productResponse = null;
         if (!ObjectUtils.isEmpty(productResponseMono.block())) {
             productResponse = productResponseMono.block();
             log.info("Updated product successfully in FakeStore Client with id : {}", productId);
@@ -138,3 +136,5 @@ public class FakeStoreClientManagementService implements IClientManagementServic
         return productResponse;
     }
 }
+
+

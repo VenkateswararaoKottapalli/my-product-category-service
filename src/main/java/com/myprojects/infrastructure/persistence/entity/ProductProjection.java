@@ -1,18 +1,18 @@
-package com.myprojects.interfaces.rest.response;
+package com.myprojects.infrastructure.persistence.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
-public class AddProductResponse {
+public class ProductProjection {
+    private Integer id;
     private String title;
-    private Double price;
     private String description;
-    private String image;
     private String category;
+    private Double price;
+    private String image;
 }
+

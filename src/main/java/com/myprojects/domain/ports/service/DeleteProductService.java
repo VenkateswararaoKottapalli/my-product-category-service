@@ -1,6 +1,6 @@
 package com.myprojects.domain.ports.service;
 
-import com.myprojects.domain.ports.inbound.IFetchProduct;
+import com.myprojects.domain.ports.inbound.IDeleteProduct;
 import com.myprojects.domain.ports.outbound.IProductPort;
 import com.myprojects.infrastructure.persistence.entity.ProductProjection;
 import com.myprojects.interfaces.rest.request.ProductResponse;
@@ -14,16 +14,16 @@ import static com.myprojects.domain.ports.service.helper.ProductCategoryHelper.g
 @Service
 @Slf4j
 @AllArgsConstructor
-public class FetchProductService implements IFetchProduct {
+public class DeleteProductService implements IDeleteProduct {
 
-    private final IProductPort fetchProductPort;
+    private final IProductPort deleteProductPort;
 
     @Override
-    public ProductResponse fetchProduct(Integer productId) {
-        log.info("Started fetching product with id: {}", productId);
-        ProductProjection productProjection = fetchProductPort.fetchProductDetails(productId, FAKE_STORE_CLIENT);
+    public ProductResponse deleteProduct(Integer productId) {
+        log.info("Started deleting product with id: {}", productId);
+        ProductProjection productProjection = deleteProductPort.deleteProduct(productId, FAKE_STORE_CLIENT);
         ProductResponse productResponse = getProductResponse(productProjection);
-        log.info("Completed fetching product with response:[{}]", productResponse);
+        log.info("Deleted product successfully with id : {}", productId);
         return productResponse;
     }
 }

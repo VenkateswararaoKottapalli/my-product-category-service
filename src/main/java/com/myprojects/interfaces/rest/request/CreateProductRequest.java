@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class AddProductRequest {
+public class CreateProductRequest {
     @NotBlank(message = "product.title.size.invalid")
     @Size(max = 255, message = "product.title.size.invalid")
     private String title;

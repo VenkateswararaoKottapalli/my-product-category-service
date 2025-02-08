@@ -1,23 +1,22 @@
 package com.myprojects.clients.request;
 
-import com.myprojects.interfaces.rest.request.AddProductRequest;
-import com.myprojects.interfaces.rest.request.ProductResponse;
-import com.myprojects.interfaces.rest.response.AddProductResponse;
+import com.myprojects.infrastructure.persistence.entity.ProductProjection;
+import com.myprojects.interfaces.rest.request.CreateProductRequest;
 
 import java.util.List;
 
 public interface IClientManagementService {
 
-    AddProductResponse addNewProduct(AddProductRequest addProductRequest);
+    ProductProjection addNewProduct(CreateProductRequest addProductRequest);
 
-    ProductResponse deleteProduct(Integer productId);
+    ProductProjection deleteProduct(Integer productId);
 
-    List<ProductResponse> fetchAllProducts();
+    List<ProductProjection> fetchAllProducts();
 
-    ProductResponse fetchProduct(Integer productId);
+    ProductProjection fetchProduct(Integer productId);
 
-    ProductResponse updateOrProduct(Integer productId, AddProductRequest addProductRequest);
+    ProductProjection createOrUpdateProduct(Integer productId, CreateProductRequest addProductRequest);
 
-    ProductResponse updateProduct(Integer productId, AddProductRequest addProductRequest);
+    ProductProjection updateProduct(Integer productId, CreateProductRequest addProductRequest);
 
 }
