@@ -10,6 +10,7 @@ import com.myprojects.interfaces.rest.response.ResponseTemplate;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.myprojects.application.constant.CommonConstants.*;
 import static com.myprojects.application.constant.ExceptionCodes.MANDATORY_PARAMETER_MISSING_CODE;
 
 @RestController
@@ -32,14 +34,15 @@ public class ProductController {
     private final IDeleteProduct deleteProduct;
     private final IUpdateProduct updateProduct;
     private final IUpdateOrCreateProduct updateOrCreateProduct;
+    private final RedisTemplate redisTemplate;
 
     @GetMapping()
     public ResponseEntity<ResponseTemplate<List<ProductResponse>>> getProducts(
-            @RequestParam(required = false) String client,@RequestParam(required = false) Integer pageNumber,
+            @RequestParam(required = false) String client, @RequestParam(required = false) Integer pageNumber,
             @RequestParam(required = false) Integer pageSize
     ) {
         log.info("Received request to fetch all products.");
-        List<ProductResponse> productResponses = fetchAllProducts.fetchAllProducts(client,pageNumber,pageSize);
+        List<ProductResponse> productResponses = fetchAllProducts.fetchAllProducts(client, pageNumber, pageSize);
         String message = ObjectUtils.isEmpty(productResponses) ?
                 messageResourceConfig.getMessage("products.list.not.available") :
                 messageResourceConfig.getMessage("products.list.available");
@@ -55,7 +58,27 @@ public class ProductController {
             @PathVariable("productId") Integer productId,
             @RequestParam(required = false) String client) {
         log.info("Request accepted to fetch the product with id: {}.", productId);
-        ProductResponse productResponse = fetchProduct.fetchProduct(productId, client);
+        ProductResponse productResponse = null;
+        if (FAKE_STORE_CLIENT.equalsIgnoreCase(client)) {
+            productResponse = (ProductResponse)
+                    redisTemplate.opsForHash()
+                            .get(FAKE_STORE_CLIENT + PRODUCT, PRODUCT + productId);
+        } else {
+            productResponse = (ProductResponse)
+                    redisTemplate.opsForHash()
+                            .get(LOCAL_CLIENT + PRODUCT, PRODUCT + productId);
+        }
+        if (productResponse == null) {
+            productResponse = fetchProduct.fetchProduct(productId, client);
+            if (productResponse != null) {
+                if (FAKE_STORE_CLIENT.equalsIgnoreCase(client)) {
+                    redisTemplate.opsForHash().put(FAKE_STORE_CLIENT + PRODUCT, PRODUCT + productId, productResponse);
+                } else {
+                    redisTemplate.opsForHash().put(LOCAL_CLIENT + PRODUCT, PRODUCT + productId, productResponse);
+                }
+            }
+        }
+
         String message = !ObjectUtils.isEmpty(productResponse) ?
                 messageResourceConfig.getMessage("product.available") :
                 messageResourceConfig.getMessage("product.not.available");

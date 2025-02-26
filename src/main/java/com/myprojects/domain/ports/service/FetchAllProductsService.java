@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,7 +27,12 @@ public class FetchAllProductsService implements IFetchAllProducts {
         log.info("Started fetching all products");
 
         Page<ProductProjection> productProjections = fetchProductPort.fetchAllProducts(client,
-                PageRequest.of(pageNumber,pageSize));
+                PageRequest.of(
+                        pageNumber,
+                        pageSize,
+                        Sort.by(Sort.Direction.DESC, "price")
+                                .and(Sort.by(Sort.Direction.ASC, "title")))
+        );
 
         List<ProductResponse> productResponseList = getProductResponseList(productProjections);
 
