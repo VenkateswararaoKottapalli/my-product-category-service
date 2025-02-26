@@ -35,10 +35,11 @@ public class ProductController {
 
     @GetMapping()
     public ResponseEntity<ResponseTemplate<List<ProductResponse>>> getProducts(
-            @RequestParam(required = false) String client
+            @RequestParam(required = false) String client,@RequestParam(required = false) Integer pageNumber,
+            @RequestParam(required = false) Integer pageSize
     ) {
         log.info("Received request to fetch all products.");
-        List<ProductResponse> productResponses = fetchAllProducts.fetchAllProducts(client);
+        List<ProductResponse> productResponses = fetchAllProducts.fetchAllProducts(client,pageNumber,pageSize);
         String message = ObjectUtils.isEmpty(productResponses) ?
                 messageResourceConfig.getMessage("products.list.not.available") :
                 messageResourceConfig.getMessage("products.list.available");

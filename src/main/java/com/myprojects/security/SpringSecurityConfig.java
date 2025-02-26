@@ -2,6 +2,7 @@ package com.myprojects.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,8 +25,9 @@ public class SpringSecurityConfig {
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf().disable()  // Disable CSRF protection for stateless JWT authentication
                 .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests
+                        authorizeRequests.requestMatchers(HttpMethod.POST, "/api/v1/products").permitAll()
                                 .anyRequest().permitAll()  // Allow all requests
                 )
                 .formLogin(Customizer.withDefaults());  // Keep form login with default settings

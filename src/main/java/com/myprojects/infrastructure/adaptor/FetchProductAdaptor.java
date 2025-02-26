@@ -7,6 +7,8 @@ import com.myprojects.infrastructure.persistence.entity.Product;
 import com.myprojects.infrastructure.persistence.entity.ProductProjection;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -36,15 +38,15 @@ public class FetchProductAdaptor implements IProductPort {
     }
 
     @Override
-    public List<ProductProjection> fetchAllProducts(String clientName) {
+    public Page<ProductProjection> fetchAllProducts(String clientName, PageRequest pageRequest) {
         log.info("Selecting client to fetch all products with client name: {}", clientName);
-        List<ProductProjection> productResponseList = null;
+        Page<ProductProjection> productResponseList = null;
         if (FAKE_STORE_CLIENT.equalsIgnoreCase(clientName)) {
             log.info("Choosing FakeStore client to fetch all products.");
-            productResponseList = clientManagementService.fetchAllProducts();
+            productResponseList = clientManagementService.fetchAllProducts(pageRequest);
         } else {
             log.info("Choosing Real client to fetch all products.");
-            productResponseList = productRepository.findAllProducts();
+            productResponseList = productRepository.findAllProducts(pageRequest);
         }
         return productResponseList;
     }

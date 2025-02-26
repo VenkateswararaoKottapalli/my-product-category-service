@@ -7,6 +7,9 @@ import com.myprojects.interfaces.rest.request.CreateProductRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -60,21 +63,21 @@ public class FakeStoreClientManagementService implements IClientManagementServic
     }
 
     @Override
-    public List<ProductProjection> fetchAllProducts() {
+    public Page<ProductProjection> fetchAllProducts(PageRequest pageRequest) {
         log.info("Started fetching all products in FakeStore Client");
-        Mono<List<ProductProjection>> productsList = webClientBuilder.build()
+        Mono<Page<ProductProjection>> productsList = webClientBuilder.build()
                 .get()
                 .uri(CommonConstants.FAKE_STORE_CLIENT_API_URL)
                 .retrieve()
                 .onStatus(httpStatusCode -> httpStatusCode.is4xxClientError() || httpStatusCode.is5xxServerError(),
                         clientResponse -> Mono.error(new RuntimeException("FakeStore Client fetch all product API call failed with status code: " + clientResponse.statusCode())))
                 .bodyToMono(new ParameterizedTypeReference<List<ProductProjection>>() {
-
-                });
-        List<ProductProjection> productResponseList = null;
+                })
+                .map(productProjections -> paginateProducts(productProjections, pageRequest));
+        Page<ProductProjection> productResponseList = null;
         if (!ObjectUtils.isEmpty(productsList.block())) {
             productResponseList = productsList.block();
-            log.info("Fetched all products in FakeStore Client with size: {}", productResponseList.size());
+            log.info("Fetched all products in FakeStore Client with size: {}", productResponseList.getTotalElements());
         }
         return productResponseList;
     }
@@ -134,6 +137,15 @@ public class FakeStoreClientManagementService implements IClientManagementServic
             log.info("Updated product successfully in FakeStore Client with id : {}", productId);
         }
         return productResponse;
+    }
+
+    private Page<ProductProjection> paginateProducts(List<ProductProjection> products, PageRequest pageRequest) {
+        int start = (pageRequest.getPageNumber()-1) * pageRequest.getPageSize();
+        int end = Math.min((start + pageRequest.getPageSize()), products.size());
+
+        List<ProductProjection> pagedProducts = products.subList(start, end);
+
+        return new PageImpl<>(pagedProducts, pageRequest, products.size());
     }
 }
 

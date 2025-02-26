@@ -2,8 +2,8 @@ package com.myprojects.clients.request;
 
 import com.myprojects.infrastructure.persistence.entity.ProductProjection;
 import com.myprojects.interfaces.rest.request.CreateProductRequest;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 public interface IClientManagementService {
 
@@ -11,7 +11,7 @@ public interface IClientManagementService {
 
     ProductProjection deleteProduct(Integer productId);
 
-    List<ProductProjection> fetchAllProducts();
+    Page<ProductProjection> fetchAllProducts(PageRequest pageRequest);
 
     ProductProjection fetchProduct(Integer productId);
 
