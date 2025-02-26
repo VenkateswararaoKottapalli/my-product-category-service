@@ -16,6 +16,13 @@ public class FetchCategoryAdaptor implements IFetchCategoryPort {
     @Override
     public Integer fetchCategoryId(String categoryName) {
         log.info("Started fetching category id for category name:{}", categoryName);
+
         return categoryRepository.findCategoryIdByName(categoryName);
+    }
+
+    @Override
+    public String fetchCategoryNameById(Integer categoryId) {
+        log.info("Started fetching category name for category id:{}", categoryId);
+        return categoryRepository.fetchCategoryNameById(categoryId);
     }
 }

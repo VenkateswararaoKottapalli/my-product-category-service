@@ -2,8 +2,8 @@ package com.myprojects.domain.ports.inbound;
 
 
 import com.myprojects.interfaces.rest.request.CreateProductRequest;
-import com.myprojects.interfaces.rest.request.ProductResponse;
+import com.myprojects.interfaces.rest.response.ProductResponse;
 
 public interface IUpdateProduct {
-    ProductResponse updateProduct(Integer productId, CreateProductRequest addProductRequest);
+    ProductResponse updateProduct(Integer productId, CreateProductRequest addProductRequest, String client);
 }

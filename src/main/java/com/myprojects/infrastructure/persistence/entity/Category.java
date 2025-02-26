@@ -1,9 +1,6 @@
 package com.myprojects.infrastructure.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -27,6 +24,6 @@ public class Category extends Audit {
     @Column(name = DESCRIPTION)
     private String description;
 
-    @OneToMany
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Product> products;
 }

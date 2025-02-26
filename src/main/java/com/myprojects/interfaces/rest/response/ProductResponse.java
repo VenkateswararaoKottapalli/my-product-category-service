@@ -1,4 +1,4 @@
-package com.myprojects.interfaces.rest.request;
+package com.myprojects.interfaces.rest.response;
 
 import lombok.*;
 
@@ -13,5 +13,5 @@ public class ProductResponse {
     private Double price;
     private String category;
     private String description;
-    private String imageUrl;
+    private String image;
 }

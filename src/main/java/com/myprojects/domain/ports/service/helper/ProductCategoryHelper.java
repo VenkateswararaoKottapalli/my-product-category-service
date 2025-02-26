@@ -1,9 +1,12 @@
 package com.myprojects.domain.ports.service.helper;
 
+import com.myprojects.domain.ports.outbound.IFetchCategoryPort;
 import com.myprojects.infrastructure.persistence.entity.Product;
 import com.myprojects.infrastructure.persistence.entity.ProductProjection;
-import com.myprojects.interfaces.rest.request.CreateProductRequest;
-import com.myprojects.interfaces.rest.request.ProductResponse;
+import com.myprojects.interfaces.rest.response.ProductResponse;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +22,7 @@ public class ProductCategoryHelper {
             productResponse.setDescription(productProjection.getDescription());
             productResponse.setPrice(productProjection.getPrice());
             productResponse.setCategory(productProjection.getCategory());
-            productResponse.setImageUrl(productProjection.getImage());
+            productResponse.setImage(productProjection.getImage());
         }
         return productResponse;
     }
@@ -33,16 +36,17 @@ public class ProductCategoryHelper {
         return productResponseList;
     }
 
-    public static Product createProduct(CreateProductRequest createProductRequest) {
-        Product product = null;
-        if (createProductRequest != null) {
-            product = new Product();
-            product.setTitle(createProductRequest.getTitle());
-            product.setDescription(createProductRequest.getDescription());
-            product.setPrice(createProductRequest.getPrice());
-            product.setImage(createProductRequest.getImage());
+    public static ProductProjection getProductProjection(Product product) {
+        ProductProjection productProjection = null;
+        if (product != null) {
+            productProjection = new ProductProjection();
+            productProjection.setId(product.getId());
+            productProjection.setTitle(product.getTitle());
+            productProjection.setDescription(product.getDescription());
+            productProjection.setPrice(product.getPrice());
+            productProjection.setImage(product.getImage());
         }
-        return product;
+        return productProjection;
     }
 
 }

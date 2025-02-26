@@ -6,12 +6,11 @@ import com.myprojects.domain.ports.outbound.IFetchCategoryPort;
 import com.myprojects.infrastructure.persistence.entity.Product;
 import com.myprojects.infrastructure.persistence.entity.ProductProjection;
 import com.myprojects.interfaces.rest.request.CreateProductRequest;
-import com.myprojects.interfaces.rest.request.ProductResponse;
+import com.myprojects.interfaces.rest.response.ProductResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import static com.myprojects.application.constant.CommonConstants.FAKE_STORE_CLIENT;
 import static com.myprojects.domain.ports.service.helper.ProductCategoryHelper.getProductResponse;
 
 @Service
@@ -23,7 +22,7 @@ public class CreateProductService implements ICreateProduct {
     private final IFetchCategoryPort fetchCategoryPort;
 
     @Override
-    public ProductResponse addNewProduct(CreateProductRequest createProductRequest) {
+    public ProductResponse addNewProduct(CreateProductRequest createProductRequest, String client) {
         log.info("Started creating product with request: {}", createProductRequest);
         Product product = new Product();
         product.setTitle(createProductRequest.getTitle());
@@ -32,7 +31,7 @@ public class CreateProductService implements ICreateProduct {
         product.setCategoryId(fetchCategoryPort.fetchCategoryId(createProductRequest.getCategory()));
         product.setImage(createProductRequest.getImage());
         ProductProjection productProjection = createProductPort.createProduct(createProductRequest,
-                FAKE_STORE_CLIENT, product);
+                client, product);
         ProductResponse addProductResponse = getProductResponse(productProjection);
         log.info("Completed creating product with response: {}", addProductResponse);
         return addProductResponse;

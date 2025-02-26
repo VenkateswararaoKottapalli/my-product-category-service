@@ -5,7 +5,7 @@ import com.myprojects.common.utility.ResponseUtility;
 import com.myprojects.domain.ports.inbound.*;
 import com.myprojects.exception.ProductCategoryException;
 import com.myprojects.interfaces.rest.request.CreateProductRequest;
-import com.myprojects.interfaces.rest.request.ProductResponse;
+import com.myprojects.interfaces.rest.response.ProductResponse;
 import com.myprojects.interfaces.rest.response.ResponseTemplate;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -34,9 +34,11 @@ public class ProductController {
     private final IUpdateOrCreateProduct updateOrCreateProduct;
 
     @GetMapping()
-    public ResponseEntity<ResponseTemplate<List<ProductResponse>>> getProducts() {
+    public ResponseEntity<ResponseTemplate<List<ProductResponse>>> getProducts(
+            @RequestParam(required = false) String client
+    ) {
         log.info("Received request to fetch all products.");
-        List<ProductResponse> productResponses = fetchAllProducts.fetchAllProducts();
+        List<ProductResponse> productResponses = fetchAllProducts.fetchAllProducts(client);
         String message = ObjectUtils.isEmpty(productResponses) ?
                 messageResourceConfig.getMessage("products.list.not.available") :
                 messageResourceConfig.getMessage("products.list.available");
@@ -49,9 +51,10 @@ public class ProductController {
 
     @GetMapping("/{productId}")
     public ResponseEntity<ResponseTemplate<ProductResponse>> getProduct(
-            @PathVariable("productId") Integer productId) {
+            @PathVariable("productId") Integer productId,
+            @RequestParam(required = false) String client) {
         log.info("Request accepted to fetch the product with id: {}.", productId);
-        ProductResponse productResponse = fetchProduct.fetchProduct(productId);
+        ProductResponse productResponse = fetchProduct.fetchProduct(productId, client);
         String message = !ObjectUtils.isEmpty(productResponse) ?
                 messageResourceConfig.getMessage("product.available") :
                 messageResourceConfig.getMessage("product.not.available");
@@ -64,11 +67,12 @@ public class ProductController {
 
     @PostMapping()
     public ResponseEntity<ResponseTemplate<ProductResponse>> createProduct(
-            @RequestBody @Valid CreateProductRequest createProductRequest
+            @RequestBody @Valid CreateProductRequest createProductRequest,
+            @RequestParam(required = false) String client
     ) {
         log.info("Request accepted to add new product with details: {}.", createProductRequest);
         validateProductRequest(createProductRequest);
-        ProductResponse addProductResponse = createProduct.addNewProduct(createProductRequest);
+        ProductResponse addProductResponse = createProduct.addNewProduct(createProductRequest, client);
         String message = !ObjectUtils.isEmpty(addProductResponse) ?
                 messageResourceConfig.getMessage("product.created") :
                 messageResourceConfig.getMessage("product.not.created");
@@ -81,9 +85,10 @@ public class ProductController {
 
     @DeleteMapping("/{productId}")
     public ResponseEntity<ResponseTemplate<ProductResponse>> deleteProduct(
-            @PathVariable("productId") Integer productId) {
+            @PathVariable("productId") Integer productId,
+            @RequestParam(required = false) String client) {
         log.info("Request accepted to delete the product with id: {}.", productId);
-        ProductResponse productResponse = deleteProduct.deleteProduct(productId);
+        ProductResponse productResponse = deleteProduct.deleteProduct(productId, client);
         String message = !ObjectUtils.isEmpty(productResponse) ?
                 messageResourceConfig.getMessage("product.deleted") :
                 messageResourceConfig.getMessage("product.not.deleted");
@@ -97,10 +102,11 @@ public class ProductController {
     @PatchMapping("/{productId}")
     public ResponseEntity<ResponseTemplate<ProductResponse>> updateProduct(
             @PathVariable("productId") Integer productId,
-            @RequestBody CreateProductRequest updateProductRequest
+            @RequestBody CreateProductRequest updateProductRequest,
+            @RequestParam(required = false) String client
     ) {
         log.info("Request accepted to update the product with id: {}.", productId);
-        ProductResponse productResponse = updateProduct.updateProduct(productId, updateProductRequest);
+        ProductResponse productResponse = updateProduct.updateProduct(productId, updateProductRequest, client);
         String message = !ObjectUtils.isEmpty(productResponse) ?
                 messageResourceConfig.getMessage("product.updated") :
                 messageResourceConfig.getMessage("product.not.updated");
@@ -114,10 +120,11 @@ public class ProductController {
     @PutMapping("/{productId}")
     public ResponseEntity<ResponseTemplate<ProductResponse>> createOrUpdateProduct(
             @PathVariable("productId") Integer productId,
-            @RequestBody CreateProductRequest createOrUpdateProductRequest
+            @RequestBody CreateProductRequest createOrUpdateProductRequest,
+            @RequestParam(required = false) String client
     ) {
         log.info("Request accepted to create or update the product with id: {}.", productId);
-        ProductResponse productResponse = updateOrCreateProduct.createOrUpdateProduct(productId, createOrUpdateProductRequest);
+        ProductResponse productResponse = updateOrCreateProduct.createOrUpdateProduct(productId, createOrUpdateProductRequest, client);
         String message = !ObjectUtils.isEmpty(productResponse) ?
                 messageResourceConfig.getMessage("product.updated.or.created") :
                 messageResourceConfig.getMessage("product.not.updated.or.created");

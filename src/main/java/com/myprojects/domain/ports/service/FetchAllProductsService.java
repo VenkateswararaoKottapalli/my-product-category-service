@@ -3,14 +3,13 @@ package com.myprojects.domain.ports.service;
 import com.myprojects.domain.ports.inbound.IFetchAllProducts;
 import com.myprojects.domain.ports.outbound.IProductPort;
 import com.myprojects.infrastructure.persistence.entity.ProductProjection;
-import com.myprojects.interfaces.rest.request.ProductResponse;
+import com.myprojects.interfaces.rest.response.ProductResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.myprojects.application.constant.CommonConstants.FAKE_STORE_CLIENT;
 import static com.myprojects.domain.ports.service.helper.ProductCategoryHelper.getProductResponseList;
 
 @Service
@@ -21,10 +20,10 @@ public class FetchAllProductsService implements IFetchAllProducts {
     private final IProductPort fetchProductPort;
 
     @Override
-    public List<ProductResponse> fetchAllProducts() {
+    public List<ProductResponse> fetchAllProducts(String client) {
         log.info("Started fetching all products");
 
-        List<ProductProjection> productProjections = fetchProductPort.fetchAllProducts(FAKE_STORE_CLIENT);
+        List<ProductProjection> productProjections = fetchProductPort.fetchAllProducts(client);
 
         List<ProductResponse> productResponseList = getProductResponseList(productProjections);
 

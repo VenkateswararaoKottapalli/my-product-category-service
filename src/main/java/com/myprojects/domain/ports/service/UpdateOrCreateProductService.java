@@ -7,13 +7,12 @@ import com.myprojects.domain.ports.outbound.IProductPort;
 import com.myprojects.infrastructure.persistence.entity.Product;
 import com.myprojects.infrastructure.persistence.entity.ProductProjection;
 import com.myprojects.interfaces.rest.request.CreateProductRequest;
-import com.myprojects.interfaces.rest.request.ProductResponse;
+import com.myprojects.interfaces.rest.response.ProductResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import static com.myprojects.application.constant.CommonConstants.FAKE_STORE_CLIENT;
 import static com.myprojects.domain.ports.service.helper.ProductCategoryHelper.getProductResponse;
 
 @Service
@@ -26,7 +25,7 @@ public class UpdateOrCreateProductService implements IUpdateOrCreateProduct {
     private final IFetchCategoryPort fetchCategoryPort;
 
     @Override
-    public ProductResponse createOrUpdateProduct(Integer productId, CreateProductRequest addProductRequest) {
+    public ProductResponse createOrUpdateProduct(Integer productId, CreateProductRequest addProductRequest, String client) {
         log.info("Started updating or creating the product with id : {}", productId);
         ProductResponse productResponse = null;
         Product product = productPort.fetchProductById(productId);
@@ -37,7 +36,7 @@ public class UpdateOrCreateProductService implements IUpdateOrCreateProduct {
         product.setCategoryId(fetchCategoryPort.fetchCategoryId(addProductRequest.getCategory()));
         product.setImage(addProductRequest.getImage());
 
-        ProductProjection productProjection = updateOrCreateProductPort.updateProduct(productId, FAKE_STORE_CLIENT,
+        ProductProjection productProjection = updateOrCreateProductPort.updateProduct(productId, client,
                 addProductRequest, product);
         productResponse = getProductResponse(productProjection);
         log.info("Updated or created product successfully with id : {}", productId);

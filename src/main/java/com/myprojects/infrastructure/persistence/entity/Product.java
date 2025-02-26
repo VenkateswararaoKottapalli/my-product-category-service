@@ -17,7 +17,7 @@ import static com.myprojects.infrastructure.persistence.constant.ProductConstant
 @Entity
 public class Product extends Audit {
 
-    @Column(name = NAME)
+    @Column(name = TITLE)
     private String title;
 
     @Column(name = DESCRIPTION)
@@ -29,13 +29,11 @@ public class Product extends Audit {
     @Column(name = CATEGORY_ID)
     private Integer categoryId;
 
-    @Column(name = IMAGE_URL)
+    @Column(name = IMAGE)
     private String image;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = CATEGORY_ID, referencedColumnName = AuditConstant.ID, insertable = false, updatable = false)
     private Category category;
-
-
 
 }
